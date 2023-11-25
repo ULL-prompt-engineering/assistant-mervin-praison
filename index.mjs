@@ -86,7 +86,13 @@ const checkStatusAndPrintMessages = async (threadId, runId) => {
                 `${role.charAt(0).toUpperCase() + role.slice(1)}: ${content}`
             );
         });
-    } else {
+    } if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
+        console.error(
+            `Run status is '${runStatus.status}'. Unable to complete the request.`
+        );
+        process.exit(1);
+    }
+    else {
         console.log("Run is not completed yet.");
         console.log(blue(inspect(runStatus)));
         setTimeout(async () => { await checkStatusAndPrintMessages(thread.id, run.id) }, 
