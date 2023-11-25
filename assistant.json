@@ -1,6 +1,19 @@
 {
-    "assistant": "asst_Dz1KCDtwlOMRJKwC4mYagTjr",
-    "thread": "thread_D3vZcTXfwv2LHPhY5qfMb1zK",
-    "run": "run_846lyssp25txVNsjxfzrCFgs",
-    "userName": "Casiano"
+    "assistant": "asst_qlNEHtMoWwlRtINnk9PfcUNm",
+    "thread": "thread_8EV4LomLAa7UqZ3i4VDYGywY",
+    "userName": "Casiano",
+    "name": "Math Tutor",
+    "instructions": "You are a personal math tutor. Write and run code to answer math questions.",
+    "tools": [
+        {
+            "type": "code_interpreter"
+        }
+    ],
+    "model": "gpt-4-1106-preview",
+    "questions": [
+        "I need to solve the equation `x^2 + 2x - 3 = 0`. Can you help me?",
+        "I need to solve the equation `3x + 11 = 14`. Can you help me?",
+        "I need to solve the equation `2x + 5 = 9`. Can you help me?"
+    ],
+    "delay": 8000
 }
