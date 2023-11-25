@@ -86,7 +86,7 @@ const checkStatusAndPrintMessages = async (threadId, runId) => {
                 `${role.charAt(0).toUpperCase() + role.slice(1)}: ${content}`
             );
         });
-    } if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
+    } else if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
         console.error(
             `Run status is '${runStatus.status}'. Unable to complete the request.`
         );
