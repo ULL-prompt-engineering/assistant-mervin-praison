@@ -1,0 +1,2 @@
+See Youtube video <a href="https://youtu.be/CPlwcY5mQ_4?si=2OuCr5k_ztRoZfOL" target="_blank">OpenAI Assistants API + Node.js 🚀 How to get Started?</a> 
+by Mervin Praison and the [blog post](https://mer.vin/2023/11/openai-assistants-api-in-node-js/) 
