@@ -108,6 +108,73 @@ await fsPromises.writeFile(
 console.log("File uploaded and successfully added to assistant\n");
 ```
 
+## Create a thread
+
+A Thread represents a conversation. We recommend [creating one Thread per user](https://platform.openai.com/docs/api-reference/threads/createThread) as soon as the user initiates the conversation. Pass any user-specific context and files in this thread by 
+[creating Messages](https://platform.openai.com/docs/api-reference/messages/createMessage).
+
+```js
+let thread = null;
+if (assistantIds.thread) {
+    try {
+        console.log("Retrieving thread from assistantIds: ", assistantIds.thread);
+        thread = await openai.beta.threads.retrieve(assistantIds.thread);
+    } catch (e) {
+        console.log(red("Error retrieving thread: "), red(e));
+        thread = null;
+    }
+} 
+if (!thread) {
+    thread = await openai.beta.threads.create();
+    assistantIds.thread = thread.id;
+}
+```
+
+Threads don’t have a size limit. 
+We can add as many Messages as we want to a Thread. 
+
+The Assistant will ensure **that requests to the model fit within the maximum context window**, using relevant optimization techniques such as **truncation**. 
+
+When we use the Assistants API, we delegate control over how many input tokens are passed to the model for any given Run, *this means we have less control over the cost of running our Assistant* but we do not have to deal with the complexity of managing the context window.
+
+## Add a message to a thread
+
+A Message contains text, and optionally any [files](https://platform.openai.com/docs/assistants/tools/supported-files) that you allow the user to upload. Messages need to be [added to a specific Thread](https://platform.openai.com/docs/api-reference/messages/createMessage)[^1]
+
+[^1]: [Adding images via message objects](https://platform.openai.com/docs/guides/vision) like in Chat Completions using GPT-4 with Vision is not supported today, but there is plan to add support for them in the future. We can still upload images and have them processes via retrieval.
+
+```js
+const message = await openai.beta.threads.messages.create(
+  thread.id,
+  {
+    role: "user",
+    content: "I need to solve the equation `3x + 11 = 14`. Can you help me?"
+  }
+);
+```
+
+Now if you list the Messages in a Thread, you will see that this message has been appended.
+
+```js
+{
+  "object": "list",
+  "data": [
+    {
+      "created_at": 1696995451,
+      "id": "msg_abc123",
+      "object": "thread.message",
+      "thread_id": "thread_abc123",
+      "role": "user",
+      "content": [{
+        "type": "text",
+        "text": {
+          "value": "I need to solve the equation `3x + 11 = 14`. Can you help me?",
+          "annotations": []
+        }
+          }],
+        ...
+```
+
 ## Run lifecycle
 
 ![](https://cdn.openai.com/API/docs/images/diagram-1.png)
