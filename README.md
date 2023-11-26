@@ -33,7 +33,10 @@ v20.5.0
    2. as part of Threads between Assistants and users. 
    3. **When using tools, Assistants can also create files** (e.g., images, spreadsheets, etc) and cite files they reference in the Messages they create.
 
-![images/assistant.png](images/assistant.png)
+| Components| Phases |
+| ---       | --- |
+|![images/assistant.png](images/assistant.png)|![images/phases.png](images/phases.png)|
+
 
 ## Run lifecycle
 
