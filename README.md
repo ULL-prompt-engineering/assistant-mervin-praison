@@ -203,19 +203,19 @@ const run = await openai.beta.threads.runs.create(
 
 ## Run lifecycle
 
+By default, a Run goes into the [queued state](https://platform.openai.com/docs/api-reference/runs/object#runs/object-status). You can periodically [retrieve the Run](https://platform.openai.com/docs/api-reference/runs/getRun) to check on its status to see if it has moved to `completed`.
+
 ![](https://cdn.openai.com/API/docs/images/diagram-1.png)
 
 In order to keep the status of your run up to date, you will have to periodically [retrieve the Run object](https://platform.openai.com/docs/api-reference/runs/getRun). You can check the `status` of the run each time you retrieve the object to determine what your application should do next. 
 
-```js
 
-    let runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
+```js
+s    let runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
     
     if (runStatus.status === "completed") {
         let lastMessageForRun = await getLastMessageForRun(openai, runId, threadId)
         console.log(purple("Last message for run: "+lastMessageForRun.content[0].text.value));
-        //let allMessages = await getAllMessagesForThread(openai, threadId);
-        //console.log(purple("All messages: "+inspect(allMessages)));
         process.exit(0);
     } else if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
         console.error(
@@ -233,4 +233,24 @@ In order to keep the status of your run up to date, you will have to periodicall
 await checkStatusAndPrintMessages(thread.id, run.id);
 ```
 
-OpenAI plans to add support for streaming to make this simpler in the near future.
+Once the Run completes, you can list the Messages added to the Thread by the Assistant.
+Here is the code for the function `getLastMessageForRun`:
+
+```js
+async function getLastMessageForRun(openai, runId, threadId) {
+    let messages = await openai.beta.threads.messages.list(threadId);
+    const lastMessageForRun = messages.data
+        .filter(
+            (message) =>
+                message.run_id === runId && message.role === "assistant"
+        )
+        .pop();
+    return lastMessageForRun;
+}
+```
+
+OpenAI plans to add support for [streaming](https://platform.openai.com/docs/guides/production-best-practices/streaming) to make this simpler in the near future[^4].
+
+[^4]: Setting `stream: true` in a request makes the model start *returning tokens as soon as they are available*, instead of waiting for the full sequence of tokens to be generated
+
+You can also retrieve the [Run Steps](https://platform.openai.com/docs/api-reference/runs/listRunSteps) of this Run if you'd like to explore or display the inner workings of the Assistant and its tools.  
