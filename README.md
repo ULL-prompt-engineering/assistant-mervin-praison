@@ -77,7 +77,36 @@ Use the `tools` parameter to give the Assistant access to up to **128 tools**. Y
 - `retrieval`, or 
 - call a third-party tools via a `function calling`.
   
-Use the `file_ids` parameter to give the tools like `code_interpreter` and `retrieval` access to files. Files are uploaded using the [File upload endpoint](https://platform.openai.com/docs/api-reference/files/create) and must have the `purpose` set to `assistants` to be used with this API. See the example at repo [ULL-prompt-engineering/assistant-file-retrieval-ralf](https://github.com/ULL-prompt-engineering/assistant-file-retrieval-ralf)
+Use the `file_ids` parameter to give the tools like `code_interpreter` and `retrieval` access to files. Files are uploaded using the [File upload endpoint](https://platform.openai.com/docs/api-reference/files/create) and must have the `purpose` set to `assistants` to be used with this API. 
+
+See the example at repo [ULL-prompt-engineering/assistant-file-retrieval-ralf](https://github.com/ULL-prompt-engineering/assistant-file-retrieval-ralf)
+
+```js
+const fileName = await askQuestion("Enter the filename to upload: ");
+
+// Upload the file
+const file = await openai.files.create({
+    file: fs.createReadStream(fileName),
+    purpose: "assistants",
+});
+
+// Retrieve existing file IDs from assistant.json to not overwrite
+let existingFileIds = assistantDetails.file_ids || [];
+
+// Update the assistant with the new file ID
+await openai.beta.assistants.update(assistantId, {
+    file_ids: [...existingFileIds, file.id],
+});
+
+// Update local assistantDetails and save to assistant.json
+assistantDetails.file_ids = [...existingFileIds, file.id];
+await fsPromises.writeFile(
+    assistantFilePath,
+    JSON.stringify(assistantDetails, null, 2)
+);
+
+console.log("File uploaded and successfully added to assistant\n");
+```
 
 ## Run lifecycle
 
