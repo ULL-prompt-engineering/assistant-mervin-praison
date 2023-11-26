@@ -1,3 +1,4 @@
+#!/usr/bin/env -S node --no-warnings 
 import util from 'util';
 const inspect = (obj) => util.inspect(obj, { depth: null });
 import { red, green, blue, purple, rl } from "./utils.mjs";

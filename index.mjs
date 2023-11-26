@@ -12,6 +12,8 @@ let question = assistantIds.questions[q] || "I need to solve the equation `3x + 
 import OpenAI from "openai";
 const openai = new OpenAI();
 
+import { getAllMessagesForThread, getLastMessageForRun } from "./get-messages.mjs";
+
 let assistant = null;
 if (assistantIds.assistant) {
     try {
@@ -75,26 +77,21 @@ console.log(green(inspect(run)))
 
 const checkStatusAndPrintMessages = async (threadId, runId) => {
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
-    console.log(blue("Run status: "))
-    console.log(blue(inspect(runStatus)));
+    
     if (runStatus.status === "completed") {
-        let messages = await openai.beta.threads.messages.list(threadId);
-        messages.data.forEach((msg) => {
-            const role = msg.role;
-            const content = msg.content[0].text.value;
-            console.log(
-                `${role.charAt(0).toUpperCase() + role.slice(1)}: ${content}`
-            );
-        });
+        let lastMessageForRun = await getLastMessageForRun(openai, runId, threadId)
+        console.log(purple("Last message for run: "+lastMessageForRun.content[0].text.value));
+        //let allMessages = await getAllMessagesForThread(openai, threadId);
+        //console.log(purple("All messages: "+inspect(allMessages)));
+        process.exit(0);
     } else if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
         console.error(
-            `Run status is '${runStatus.status}'. Unable to complete the request.`
+            red(`Run status is '${runStatus.status}'. Unable to complete the request.`)
         );
         process.exit(1);
     }
     else {
-        console.log("Run is not completed yet.");
-        console.log(blue(inspect(runStatus)));
+        console.log("Run is not completed yet.", blue(inspect(runStatus.status)));
         setTimeout(async () => { await checkStatusAndPrintMessages(thread.id, run.id) }, 
           assistantIds.delay || 9000);
     }
