@@ -35,7 +35,7 @@ v20.5.0
 
 | Components| Phases |
 | ---       | --- |
-|![images/assistant.png](images/assistant.png)|![images/phases.png](images/phases.png)|
+|<img src="images/assistant.png" alt="images/assistant.png" width="65%"/>|![images/phases.png](images/phases.png)|
 
 
 ## Run lifecycle
