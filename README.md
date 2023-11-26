@@ -37,6 +37,47 @@ v20.5.0
 | ---       | --- |
 |<img src="images/assistant.png" alt="images/assistant.png" width="65%"/>|![images/phases.png](images/phases.png)|
 
+## Create an assistant
+
+
+To get started, creating an Assistant only requires specifying the `model` to use. But you can further customize the behavior of the Assistant.
+
+Use the `instructions` parameter to guide the personality of the Assistant and define it’s goals. Instructions are similar to system messages in the Chat Completions API. We can also 
+use `openai.beta.assistants.retrieve(assistantId)` to retrieve an existing Assistant.
+
+```js
+const assistantIds = JSON.parse(fs.readFileSync("assistant.json", "utf8"));
+import OpenAI from "openai";
+const openai = new OpenAI();
+
+let assistant = null;
+if (assistantIds.assistant) {
+    try {
+        console.log("Retrieving assistant from assistantIds: ", assistantIds.assistant);
+        assistant = await openai.beta.assistants.retrieve(assistantIds.assistant);
+    } catch (e) {
+        console.log(red("Error retrieving assistant: "), red(e));
+        assistant = null;
+    }
+}
+if (!assistant) {
+    assistant = await openai.beta.assistants.create({
+        name: assistantIds.name || "Math Tutor",
+        instructions: assistantIds.instructions || "You are a personal math tutor. Write and run code to answer math questions.",
+        tools: [] /* assistantIds.tools */,
+        model: assistantIds.model,
+    });
+    assistantIds.assistant = assistant.id;
+}
+```
+See the file [assistant.json](assistant.json) for the values of the parameters.
+
+Use the `tools` parameter to give the Assistant access to up to **128 tools**. You can give it access to OpenAI-hosted tools like 
+- `code_interpreter` and 
+- `retrieval`, or 
+- call a third-party tools via a `function calling`.
+  
+Use the `file_ids` parameter to give the tools like `code_interpreter` and `retrieval` access to files. Files are uploaded using the [File upload endpoint](https://platform.openai.com/docs/api-reference/files/create) and must have the `purpose` set to `assistants` to be used with this API. See the example at repo [ULL-prompt-engineering/assistant-file-retrieval-ralf](https://github.com/ULL-prompt-engineering/assistant-file-retrieval-ralf)
 
 ## Run lifecycle
 
