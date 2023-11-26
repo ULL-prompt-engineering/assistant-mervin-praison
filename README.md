@@ -133,9 +133,11 @@ if (!thread) {
 Threads don’t have a size limit. 
 We can add as many Messages as we want to a Thread. 
 
-The Assistant will ensure **that requests to the model fit within the maximum context window**, using relevant optimization techniques such as **truncation**. 
+The Assistant will ensure **that requests to the model fit within the maximum [^3]**, using relevant optimization techniques such as **truncation**. 
 
-When we use the Assistants API, we delegate control over how many input tokens are passed to the model for any given Run, *this means we have less control over the cost of running our Assistant* but we do not have to deal with the complexity of managing the context window.
+[^3]: The term "**context window**" refers to the amount of input text the model can consider at once, directly impacting its ability to generate coherent and contextually appropriate responses
+
+When we use the Assistants API, we delegate control over how many input tokens are passed to the model for any given Run, *this means we have less control over the cost of running our Assistant* but we do not have to deal with the complexity of managing the **context window**.
 
 ## Add a message to a thread
 
@@ -173,6 +175,30 @@ Now if you list the Messages in a Thread, you will see that this message has bee
         }
           }],
         ...
+```
+
+## Create a run
+
+For the Assistant to respond to the user message, you need to [create a Run](https://platform.openai.com/docs/api-reference/runs/createRun). This makes 
+
+1. The Assistant read the Thread and decide whether 
+   1. to call tools (if they are enabled) or
+   2. simply use the model to best answer the query. 
+2. As the run progresses, the assistant appends Messages to the thread with the `role="assistant"`. 
+3. The Assistant will also automatically decide what previous Messages to include in the **context window** for the model[^2]. 
+
+[^2]: This has both an impact on pricing as well as model performance. The current approach has been optimized based on what we learned building ChatGPT and will likely evolve over time.
+
+You can optionally pass additional instructions to the Assistant while creating the Run but note that these instructions override the default instructions of the Assistant.
+
+```js
+const run = await openai.beta.threads.runs.create(
+  thread.id,
+  { 
+    assistant_id: assistant.id,
+    instructions: "Please address the user as Jane Doe. The user has a premium account."
+  }
+);
 ```
 
 ## Run lifecycle
